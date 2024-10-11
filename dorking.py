@@ -125,9 +125,15 @@ if __name__ == '__main__':
         query_input = input("No query specified. Please enter a single query: ")
         queries = [query_input]
         
-    # Clean the domain and query to remove extra quotes
-    domain = args.domain.strip("'\"")
-    query = args.query.strip("'\"")
+    # Optional flag to control maximum number of results to return
+    parser.add_argument('--max-results', type=int, default=10, help="Maximum number of search results to return (default: 10)")
     
-    # Run dorks using the obtained domains and queries
-    run_dorks(domains, queries)
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Clean the domain and query to remove extra quotes and brackets
+    domain = args.domain.strip("'\"[]")
+    query = args.query.strip("'\"")
+
+    # Run dorks using the cleaned domain and query
+    run_dorks(domain, [query], args.max_results)
