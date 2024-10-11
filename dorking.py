@@ -1,11 +1,9 @@
-#!/bin/bash python3
+#!/usr/bin/env python3
 
 import argparse
 import sys
 import configparser
 import requests
-
-#from googlesearch import search
 
 # Check if googlesearch library is installed
 try:
@@ -65,21 +63,23 @@ def google_search(query, api_key, cse_id, max_results=5):
         sys.exit(1)
 
 # Function to run Google dorking queries
-def run_dorks(domain, queries, max_results=5):
+def run_dorks(domains, queries, max_results=5):
     api_key, cse_id = load_config()  # Load credentials from config file
-    for query in queries:
-        dork_query = f"site:{domain} {query}"
-        print(f"\nRunning query: {dork_query}\n")
-        
-        results = google_search(dork_query, api_key, cse_id, max_results)
-        
-        if results:
-            for result in results:
-                print(f"Title: {result['title']}")
-                print(f"Link: {result['link']}")
-                print(f"Snippet: {result.get('snippet', 'No description available')}\n")
-        else:
-            print("No results found.\n")
+    for domain in domains:
+        domain = domain.strip("'\"[]")  # Clean the domain
+        for query in queries:
+            dork_query = f"site:{domain} {query}"
+            print(f"\nRunning query: {dork_query}\n")
+            
+            results = google_search(dork_query, api_key, cse_id, max_results)
+            
+            if results:
+                for result in results:
+                    print(f"Title: {result['title']}")
+                    print(f"Link: {result['link']}")
+                    print(f"Snippet: {result.get('snippet', 'No description available')}\n")
+            else:
+                print("No results found.\n")
 
 # Main execution flow
 if __name__ == '__main__':
@@ -97,6 +97,9 @@ if __name__ == '__main__':
     # Flag for displaying the help file
     parser.add_argument('--helpfile', action='store_true', help="Display the help file with usage instructions")
     
+    # Optional flag to control maximum number of results to return
+    parser.add_argument('--max-results', type=int, default=10, help="Maximum number of search results to return (default: 10)")
+
     # Parse the arguments
     args = parser.parse_args()
 
@@ -124,16 +127,6 @@ if __name__ == '__main__':
         # Default to user input if no query option is provided
         query_input = input("No query specified. Please enter a single query: ")
         queries = [query_input]
-        
-    # Optional flag to control maximum number of results to return
-    parser.add_argument('--max-results', type=int, default=10, help="Maximum number of search results to return (default: 10)")
-    
-    # Parse the arguments
-    args = parser.parse_args()
 
-    # Clean the domain and query to remove extra quotes and brackets
-    domain = args.domain.strip("'\"[]")
-    query = args.query.strip("'\"")
-
-    # Run dorks using the cleaned domain and query
-    run_dorks(domain, [query], args.max_results)
+    # Run dorks using the cleaned domains and queries
+    run_dorks(domains, queries, args.max_results)
