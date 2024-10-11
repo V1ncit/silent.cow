@@ -128,5 +128,10 @@ if __name__ == '__main__':
         query_input = input("No query specified. Please enter a single query: ")
         queries = [query_input]
 
-    # Run dorks using the cleaned domains and queries
-    run_dorks(domains, queries, args.max_results)
+    # Graceful exit on Ctrl+C
+    try:
+        # Run dorks using the cleaned domains and queries
+        run_dorks(domains, queries, args.max_results)
+    except KeyboardInterrupt:
+        print("\nGracefully exiting the script. Goodbye!")
+        sys.exit(0)
