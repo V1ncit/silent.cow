@@ -2,6 +2,8 @@
 
 import argparse
 import sys
+import configparser
+import requests
 
 #from googlesearch import search
 
@@ -122,6 +124,10 @@ if __name__ == '__main__':
         # Default to user input if no query option is provided
         query_input = input("No query specified. Please enter a single query: ")
         queries = [query_input]
-
+        
+    # Clean the domain and query to remove extra quotes
+    domain = args.domain.strip("'\"")
+    query = args.query.strip("'\"")
+    
     # Run dorks using the obtained domains and queries
     run_dorks(domains, queries)
