@@ -1,0 +1,13 @@
+Usage Instructions for the Google Dorking Script:
+
+1. To run the script with a single domain and a single query:
+   script.py --single-domain example.com --single-query 'intitle:"index of"'
+
+2. To run the script with a list of domains from a file and a single query:
+   script.py --domain-file domains.txt --single-query 'intitle:"index of"'
+
+3. To run the script with a single domain and queries from a file:
+   script.py --single-domain example.com --query-file queries.txt
+
+4. To display this help file:
+   script.py --helpfile
