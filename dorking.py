@@ -29,23 +29,55 @@ def display_helpfile():
     except FileNotFoundError:
         print(f"Help file '{helpfile_path}' not found. Please ensure the file exists in the same directory as this script.")
 
+# Function to read API key and CSE ID from dorking.conf
+def load_config(config_file='dorking.conf'):
+    config = configparser.ConfigParser()
+    try:
+        config.read(config_file)
+        api_key = config['google']['api_key']
+        cse_id = config['google']['cse_id']
+        return api_key, cse_id
+    except KeyError as e:
+        print(f"Missing configuration for {e} in {config_file}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Configuration file {config_file} not found.")
+        sys.exit(1)
+
+# Function to perform search using Google Custom Search JSON API
+def google_search(query, api_key, cse_id, max_results=5):
+    url = f"https://www.googleapis.com/customsearch/v1"
+    params = {
+        'key': api_key,
+        'cx': cse_id,
+        'q': query,
+        'num': max_results  # Max number of results per query (limit 10 per API call)
+    }
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raise an error for bad responses
+        search_results = response.json()
+        return search_results.get('items', [])  # Return list of search items
+    except requests.exceptions.RequestException as e:
+        print(f"Error during the API request: {e}")
+        sys.exit(1)
+
 # Function to run Google dorking queries
 def run_dorks(domain, queries, max_results=5):
-    print(f"\nRunning dorking queries for: {domain}\n")
+    api_key, cse_id = load_config()  # Load credentials from config file
     for query in queries:
-        # Add "site:{domain}" in front of each query
         dork_query = f"site:{domain} {query}"
-        print(f"Query: {dork_query}")
+        print(f"\nRunning query: {dork_query}\n")
         
-        try:
-            count = 0
-            for result in search(dork_query):  # No num_results, use manual count
-                print(f"Found: {result}")
-                count += 1
-                if count >= max_results:
-                    break
-        except Exception as e:
-            print(f"Error while searching: {e}")
+        results = google_search(dork_query, api_key, cse_id, max_results)
+        
+        if results:
+            for result in results:
+                print(f"Title: {result['title']}")
+                print(f"Link: {result['link']}")
+                print(f"Snippet: {result.get('snippet', 'No description available')}\n")
+        else:
+            print("No results found.\n")
 
 # Main execution flow
 if __name__ == '__main__':
