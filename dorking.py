@@ -4,6 +4,7 @@ import argparse
 import sys
 import configparser
 import requests
+import time as sleep
 
 # Check if googlesearch library is installed
 try:
@@ -80,6 +81,8 @@ def run_dorks(domains, queries, max_results=5):
                     print(f"Snippet: {result.get('snippet', 'No description available')}\n")
             else:
                 print("No results found.\n")
+
+            sleep(0.2)  # Sleep for 0.2 seconds between requests to limit to 5 requests per second
 
 # Main execution flow
 if __name__ == '__main__':
