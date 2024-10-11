@@ -1,7 +1,10 @@
 #!/bin/bash python3
 
 import argparse
+import sys
+
 #from googlesearch import search
+
 # Check if googlesearch library is installed
 try:
     from googlesearch import search
@@ -27,20 +30,22 @@ def display_helpfile():
         print(f"Help file '{helpfile_path}' not found. Please ensure the file exists in the same directory as this script.")
 
 # Function to run Google dorking queries
-def run_dorks(domains, queries):
-    for domain in domains:
-        print(f"\nRunning dorking queries for: {domain}\n")
-        for query in queries:
-            # Add "site:{domain}" in front of each query
-            dork_query = f"site:{domain} {query}"
-            print(f"Query: {dork_query}")
-
-            try:
-                # Run the search and return a limited number of results (e.g., 5)
-                for result in search(dork_query, num_results=5):
-                    print(f"Found: {result}")
-            except Exception as e:
-                print(f"Error while searching: {e}")
+def run_dorks(domain, queries, max_results=5):
+    print(f"\nRunning dorking queries for: {domain}\n")
+    for query in queries:
+        # Add "site:{domain}" in front of each query
+        dork_query = f"site:{domain} {query}"
+        print(f"Query: {dork_query}")
+        
+        try:
+            count = 0
+            for result in search(dork_query):  # No num_results, use manual count
+                print(f"Found: {result}")
+                count += 1
+                if count >= max_results:
+                    break
+        except Exception as e:
+            print(f"Error while searching: {e}")
 
 # Main execution flow
 if __name__ == '__main__':
