@@ -3,6 +3,9 @@
 # Domæne, som du vil tjekke certifikater for
 DOMAIN="eksempel.dk"
 
+# Filnavn til output
+OUTPUT_FILE="subdomains.txt"
+
 # CertSpotter API base URL
 API_URL="https://api.certspotter.com/v1/issuances?domain=$DOMAIN&include_subdomains=true&expand=dns_names"
 
@@ -35,6 +38,8 @@ if [[ -z "$all_results" ]]; then
   exit 1
 fi
 
-# Udskriv alle resultaterne
-echo "Certifikater for $DOMAIN:"
-echo "$all_results"
+# Ekstraktion af subdomæner og skrivning til fil
+echo "$all_results" | jq -r '.[] | .dns_names[]' | sort -u > $OUTPUT_FILE
+
+# Udskriv besked om filen
+echo "Subdomæner er blevet gemt i $OUTPUT_FILE"
